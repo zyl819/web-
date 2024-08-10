@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Card, Col, Row, Form, Input, Button, Select } from 'antd';
+import { Form, Input, Button, Select, DatePicker } from 'antd';
 import TaskCard from '../components/TaskCard';
+import moment from 'moment';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -13,6 +14,7 @@ function BoardPage() {
   });
 
   const [form] = Form.useForm();
+  const username = localStorage.getItem('username');
 
   const addTask = (values) => {
     const newTask = {
@@ -20,6 +22,7 @@ function BoardPage() {
       title: values.title,
       description: values.description,
       status: values.status,
+      deadline: values.deadline ? values.deadline.format('YYYY-MM-DD') : null,  // 保存截止日期
     };
 
     setTasks((prevTasks) => ({
@@ -60,6 +63,9 @@ function BoardPage() {
 
   return (
     <div style={styles.board}>
+      <div style={styles.usernameContainer}>
+        <span style={styles.username}>{username}</span>
+      </div>
       <div style={styles.listsContainer}>
         <div style={styles.list}>
           <h3 style={styles.listTitle}>待处理</h3>
@@ -96,6 +102,10 @@ function BoardPage() {
             </Select>
           </Form.Item>
 
+          <Form.Item name="deadline" label="截止日期">
+            <DatePicker placeholder="请选择截止日期" style={styles.input} />
+          </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
               添加任务
@@ -118,6 +128,16 @@ const styles = {
     backgroundColor: '#f0f2f5',
     overflowX: 'auto',
     boxSizing: 'border-box',
+    position: 'relative',
+  },
+  usernameContainer: {
+    position: 'absolute',
+    top: '10px',
+    right: '20px',
+  },
+  username: {
+    fontSize: '16px',
+    fontWeight: 'bold',
   },
   listsContainer: {
     display: 'flex',
