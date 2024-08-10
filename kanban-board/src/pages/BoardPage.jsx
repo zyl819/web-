@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Select, DatePicker, Layout, Typography } from 'antd';
-import { useLocation } from 'react-router-dom';
 import TaskCard from '../components/TaskCard';
+import moment from 'moment';
 
 const { Header, Content } = Layout;
 const { TextArea } = Input;
@@ -15,10 +15,14 @@ function BoardPage() {
     done: [],
   });
 
-  const location = useLocation();
-  const projectName = location.state?.projectName || localStorage.getItem('projectName') || '项目名称';
+  const [projectName, setProjectName] = useState('');
   const [form] = Form.useForm();
   const username = localStorage.getItem('username');
+
+  useEffect(() => {
+    const fetchedProjectName = "示例项目名称"; // 示例项目名称
+    setProjectName(fetchedProjectName);
+  }, []);
 
   const addTask = (values) => {
     const newTask = {
@@ -29,17 +33,10 @@ function BoardPage() {
       deadline: values.deadline ? values.deadline.format('YYYY-MM-DD') : null,
     };
 
-    console.log("Adding task:", newTask);
-
-    setTasks((prevTasks) => {
-      console.log("Previous tasks:", prevTasks);
-      const updatedTasks = {
-        ...prevTasks,
-        [values.status]: [...prevTasks[values.status], newTask],
-      };
-      console.log("Updated tasks:", updatedTasks);
-      return updatedTasks;
-    });
+    setTasks((prevTasks) => ({
+      ...prevTasks,
+      [values.status]: [...prevTasks[values.status], newTask],
+    }));
 
     form.resetFields();
   };
@@ -68,7 +65,6 @@ function BoardPage() {
         updatedTasks[newStatus] = [...updatedTasks[newStatus], taskToMove];
       }
 
-      console.log("Updated tasks after status change:", updatedTasks);
       return updatedTasks;
     });
   };
@@ -77,7 +73,7 @@ function BoardPage() {
     <Layout style={styles.layout}>
       <Header style={styles.header}>
         <div style={styles.headerContent}>
-          <Title level={3} style={styles.projectName}>{projectName}</Title>
+          <Title level={3} style={styles.projectName}>任务面板</Title>
           <span style={styles.username}>{username}</span>
         </div>
       </Header>
@@ -139,6 +135,7 @@ const styles = {
     minHeight: '100vh',
     width: '100vw',
     overflowX: 'hidden',
+    backgroundImage: 'linear-gradient(to right, #f5f7fa, #c3cfe2)', // 设置背景颜色
   },
   header: {
     backgroundColor: '#001529',

@@ -60,7 +60,13 @@ function ProjectPage() {
             bordered
             dataSource={projects}
             renderItem={(project, index) => (
-              <List.Item onClick={() => selectProject(project.id)}>
+              <List.Item
+                actions={[
+                  <Button type="link" onClick={() => selectProject(project.id)}>
+                    进入项目
+                  </Button>
+                ]}
+              >
                 {index + 1}. {project.name}
               </List.Item>
             )}
@@ -91,6 +97,7 @@ const styles = {
   layout: {
     minHeight: '100vh',
     width: '100vw',
+    backgroundImage: 'linear-gradient(to right, #f5f7fa, #c3cfe2)', // 添加背景颜色
   },
   header: {
     backgroundColor: '#001529',

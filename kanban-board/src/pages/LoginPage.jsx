@@ -1,41 +1,43 @@
 import React from 'react';
+import { Form, Input, Button, Card, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button } from 'antd';
-import axios from 'axios';
+
+const { Title } = Typography;
 
 function LoginPage() {
   const navigate = useNavigate();
 
-  const onFinish = async (values) => {
-    try {
-      const response = await axios.post('/api/login', { username: values.username });
-      if (response.data) {
-        localStorage.setItem('username', response.data.username);
-        navigate('/projects');
-      }
-    } catch (error) {
-      console.error('登录失败', error);
-    }
+  const onFinish = (values) => {
+    localStorage.setItem('username', values.username);
+    navigate('/projects');
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.formContainer}>
-        <h2>登录</h2>
-        <Form name="login" onFinish={onFinish}>
+      <Card style={styles.card}>
+        <Title level={3} style={styles.title}>登录</Title>
+        <Form
+          name="login"
+          onFinish={onFinish}
+          layout="vertical"
+          style={styles.form}
+        >
           <Form.Item
+            label="用户名"
             name="username"
             rules={[{ required: true, message: '请输入用户名' }]}
+            style={styles.formItem}
           >
-            <Input placeholder="用户名" />
+            <Input placeholder="请输入用户名" style={styles.input} />
           </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+
+          <Form.Item style={styles.formItem}>
+            <Button type="primary" htmlType="submit" style={styles.button}>
               登录
             </Button>
           </Form.Item>
         </Form>
-      </div>
+      </Card>
     </div>
   );
 }
@@ -46,19 +48,39 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh',
-    width: '100vw',
-    margin: 0,
-    padding: 0,
-    backgroundColor: '#f0f2f5',
+    backgroundImage: 'linear-gradient(to right, #6a11cb, #2575fc)',
+    margin: 0,  // 移除所有外边距
+    padding: 0,  // 移除所有内边距
     boxSizing: 'border-box',
+    width: '100vw', // 使容器占满整个视口宽度
   },
-  formContainer: {
-    backgroundColor: 'white',
-    padding: '40px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-    maxWidth: '300px',
+  card: {
+    width: '100%', 
+    maxWidth: '400px', 
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+    textAlign: 'center',
+  },
+  title: {
+    marginBottom: '20px',
+    color: '#333',
+  },
+  form: {
     width: '100%',
+  },
+  formItem: {
+    marginBottom: '15px',
+  },
+  input: {
+    height: '40px',
+    borderRadius: '5px',
+  },
+  button: {
+    width: '100%',
+    height: '40px',
+    borderRadius: '5px',
+    fontWeight: 'bold',
   },
 };
 

@@ -4,11 +4,25 @@ import { Card, Select } from 'antd';
 const { Option } = Select;
 
 function TaskCard({ task, onChangeStatus }) {
+  // 根据任务状态设置卡片的背景颜色
+  const getCardStyle = () => {
+    switch (task.status) {
+      case 'todo':
+        return { backgroundColor: '#fff4e6', borderColor: '#ffa940' }; // 浅橙色
+      case 'inProgress':
+        return { backgroundColor: '#e6f7ff', borderColor: '#69c0ff' }; // 浅蓝色
+      case 'done':
+        return { backgroundColor: '#f6ffed', borderColor: '#73d13d' }; // 浅绿色
+      default:
+        return { backgroundColor: '#ffffff', borderColor: '#d9d9d9' }; // 默认白色
+    }
+  };
+
   return (
     <Card 
       title={task.title} 
       extra={<span>{task.deadline}</span>} 
-      style={styles.card}  // 使用自定义样式
+      style={{ ...styles.card, ...getCardStyle() }}  // 动态应用样式
     >
       <p>{task.description}</p>
       <Select
@@ -25,9 +39,9 @@ function TaskCard({ task, onChangeStatus }) {
 
 const styles = {
   card: {
-    border: '2px solid #1890ff',  // 边框加粗并使用更显眼的颜色
+    border: '2px solid',
     borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',  // 更明显的阴影
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
   },
 };
 
