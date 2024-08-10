@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { List, Button, Input, Form } from 'antd';
+import { List, Button, Input, Form, Layout, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
+const { Header, Content } = Layout;
+const { Title } = Typography;
 
 function ProjectPage() {
   const [projects, setProjects] = useState([]);
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const username = localStorage.getItem('username');  // 获取用户名
+  const username = localStorage.getItem('username');
 
   useEffect(() => {
     async function fetchProjects() {
@@ -38,80 +41,96 @@ function ProjectPage() {
     }
   };
 
-  const selectProject = (id) => {
-    navigate(`/projects/${id}/tasks`);
+  const selectProject = (projectId) => {
+    navigate(`/projects/${projectId}/tasks`);
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.projectContainer}>
-        <h2 style={styles.title}>{username}的项目列表</h2>
-        <List
-          bordered
-          dataSource={projects}
-          renderItem={(project, index) => (
-            <List.Item onClick={() => selectProject(project.id)}>
-              {index + 1}. {project.name}
-            </List.Item>
-          )}
-        />
-        <h3 style={styles.subtitle}>创建新项目</h3>
-        <Form form={form} onFinish={addProject} layout="vertical" style={styles.form}>
-          <Form.Item
-            name="name"
-            label="项目名称"
-            rules={[{ required: true, message: '请输入项目名称' }]}
-            style={styles.formItem}
-          >
-            <Input placeholder="请输入项目名称" style={styles.input} />
-          </Form.Item>
-          <Form.Item style={styles.formItem}>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-              创建项目
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
-    </div>
+    <Layout style={styles.layout}>
+      <Header style={styles.header}>
+        <div style={styles.headerContent}>
+          <Title level={3} style={styles.title}>项目管理系统</Title>
+          <span style={styles.username}>{username}</span>
+        </div>
+      </Header>
+      <Content style={styles.content}>
+        <div style={styles.projectContainer}>
+          <h2 style={styles.listTitle}>{username}的项目列表</h2>
+          <List
+            bordered
+            dataSource={projects}
+            renderItem={(project, index) => (
+              <List.Item onClick={() => selectProject(project.id)}>
+                {index + 1}. {project.name}
+              </List.Item>
+            )}
+          />
+          <h3 style={styles.subtitle}>创建新项目</h3>
+          <Form form={form} onFinish={addProject} layout="vertical" style={styles.form}>
+            <Form.Item
+              name="name"
+              label="项目名称"
+              rules={[{ required: true, message: '请输入项目名称' }]}
+              style={styles.formItem}
+            >
+              <Input placeholder="请输入项目名称" style={styles.input} />
+            </Form.Item>
+            <Form.Item style={styles.formItem}>
+              <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+                创建项目
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      </Content>
+    </Layout>
   );
 }
 
 const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh',
+  layout: {
+    minHeight: '100vh',
     width: '100vw',
-    margin: 0,
-    padding: 0,
-    backgroundColor: '#f0f2f5',
-    boxSizing: 'border-box',
-    position: 'relative',
   },
-  usernameContainer: {
-    position: 'absolute',
-    top: '10px',
-    right: '20px',
+  header: {
+    backgroundColor: '#001529',
+    padding: '0 20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  headerContent: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  title: {
+    color: '#fff',
+    margin: 0,
   },
   username: {
+    color: '#fff',
     fontSize: '16px',
-    fontWeight: 'bold',
+  },
+  content: {
+    padding: '20px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    boxSizing: 'border-box',
   },
   projectContainer: {
     backgroundColor: 'white',
     padding: '40px',
     borderRadius: '8px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-    maxWidth: '500px',
+    maxWidth: '600px',
     width: '100%',
-    height: '60%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
   },
-  title: {
+  listTitle: {
     textAlign: 'center',
     marginBottom: '20px',
   },
@@ -125,7 +144,7 @@ const styles = {
     alignItems: 'center',
   },
   formItem: {
-    width: '80%', // 控制输入框宽度
+    width: '100%',
   },
   input: {
     width: '100%',

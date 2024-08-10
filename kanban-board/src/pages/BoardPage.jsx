@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Select, DatePicker } from 'antd';
+import { Form, Input, Button, Select, DatePicker, Layout, Typography } from 'antd';
+import { useLocation } from 'react-router-dom';
 import TaskCard from '../components/TaskCard';
-import moment from 'moment';
 
+const { Header, Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
+const { Title } = Typography;
 
 function BoardPage() {
   const [tasks, setTasks] = useState({
@@ -13,6 +15,8 @@ function BoardPage() {
     done: [],
   });
 
+  const location = useLocation();
+  const projectName = location.state?.projectName || localStorage.getItem('projectName') || '项目名称';
   const [form] = Form.useForm();
   const username = localStorage.getItem('username');
 
@@ -22,13 +26,20 @@ function BoardPage() {
       title: values.title,
       description: values.description,
       status: values.status,
-      deadline: values.deadline ? values.deadline.format('YYYY-MM-DD') : null,  // 保存截止日期
+      deadline: values.deadline ? values.deadline.format('YYYY-MM-DD') : null,
     };
 
-    setTasks((prevTasks) => ({
-      ...prevTasks,
-      [values.status]: [...prevTasks[values.status], newTask],
-    }));
+    console.log("Adding task:", newTask);
+
+    setTasks((prevTasks) => {
+      console.log("Previous tasks:", prevTasks);
+      const updatedTasks = {
+        ...prevTasks,
+        [values.status]: [...prevTasks[values.status], newTask],
+      };
+      console.log("Updated tasks:", updatedTasks);
+      return updatedTasks;
+    });
 
     form.resetFields();
   };
@@ -57,98 +68,120 @@ function BoardPage() {
         updatedTasks[newStatus] = [...updatedTasks[newStatus], taskToMove];
       }
 
+      console.log("Updated tasks after status change:", updatedTasks);
       return updatedTasks;
     });
   };
 
   return (
-    <div style={styles.board}>
-      <div style={styles.usernameContainer}>
-        <span style={styles.username}>{username}</span>
-      </div>
-      <div style={styles.listsContainer}>
-        <div style={styles.list}>
-          <h3 style={styles.listTitle}>待处理</h3>
-          {tasks.todo.map((task) => (
-            <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
-          ))}
+    <Layout style={styles.layout}>
+      <Header style={styles.header}>
+        <div style={styles.headerContent}>
+          <Title level={3} style={styles.projectName}>{projectName}</Title>
+          <span style={styles.username}>{username}</span>
         </div>
-        <div style={styles.list}>
-          <h3 style={styles.listTitle}>进行中</h3>
-          {tasks.inProgress.map((task) => (
-            <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
-          ))}
+      </Header>
+      <Content style={styles.content}>
+        <div style={styles.listsContainer}>
+          <div style={styles.list}>
+            <h3 style={styles.listTitle}>待处理</h3>
+            {tasks.todo.map((task) => (
+              <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
+            ))}
+          </div>
+          <div style={styles.list}>
+            <h3 style={styles.listTitle}>进行中</h3>
+            {tasks.inProgress.map((task) => (
+              <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
+            ))}
+          </div>
+          <div style={styles.list}>
+            <h3 style={styles.listTitle}>已完成</h3>
+            {tasks.done.map((task) => (
+              <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
+            ))}
+          </div>
+          <Form form={form} onFinish={addTask} layout="vertical" style={styles.form}>
+            <Form.Item name="title" label="任务标题" rules={[{ required: true, message: '请输入任务标题' }]}>
+              <Input placeholder="请输入任务标题" style={styles.input} />
+            </Form.Item>
+
+            <Form.Item name="description" label="任务描述">
+              <TextArea rows={4} placeholder="请输入任务描述" style={styles.input} />
+            </Form.Item>
+
+            <Form.Item name="status" label="任务状态" rules={[{ required: true, message: '请选择任务状态' }]}>
+              <Select placeholder="请选择任务状态" style={styles.input}>
+                <Option value="todo">待处理</Option>
+                <Option value="inProgress">进行中</Option>
+                <Option value="done">已完成</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item name="deadline" label="截止日期">
+              <DatePicker placeholder="请选择截止日期" style={styles.input} />
+            </Form.Item>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+                添加任务
+              </Button>
+            </Form.Item>
+          </Form>
         </div>
-        <div style={styles.list}>
-          <h3 style={styles.listTitle}>已完成</h3>
-          {tasks.done.map((task) => (
-            <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
-          ))}
-        </div>
-        <Form form={form} onFinish={addTask} layout="vertical" style={styles.form}>
-          <Form.Item name="title" label="任务标题" rules={[{ required: true, message: '请输入任务标题' }]}>
-            <Input placeholder="请输入任务标题" style={styles.input} />
-          </Form.Item>
-
-          <Form.Item name="description" label="任务描述">
-            <TextArea rows={4} placeholder="请输入任务描述" style={styles.input} />
-          </Form.Item>
-
-          <Form.Item name="status" label="任务状态" rules={[{ required: true, message: '请选择任务状态' }]}>
-            <Select placeholder="请选择任务状态" style={styles.input}>
-              <Option value="todo">待处理</Option>
-              <Option value="inProgress">进行中</Option>
-              <Option value="done">已完成</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="deadline" label="截止日期">
-            <DatePicker placeholder="请选择截止日期" style={styles.input} />
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-              添加任务
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
-    </div>
+      </Content>
+    </Layout>
   );
 }
 
 const styles = {
-  board: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    height: '100vh',
+  layout: {
+    minHeight: '100vh',
     width: '100vw',
-    padding: '20px',
-    backgroundColor: '#f0f2f5',
-    overflowX: 'auto',
-    boxSizing: 'border-box',
-    position: 'relative',
+    overflowX: 'hidden',
   },
-  usernameContainer: {
-    position: 'absolute',
-    top: '10px',
-    right: '20px',
+  header: {
+    backgroundColor: '#001529',
+    padding: '0 20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  headerContent: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  projectName: {
+    color: '#fff',
+    margin: 0,
   },
   username: {
+    color: '#fff',
     fontSize: '16px',
-    fontWeight: 'bold',
+  },
+  content: {
+    padding: '20px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    boxSizing: 'border-box',
   },
   listsContainer: {
     display: 'flex',
     gap: '20px',
+    justifyContent: 'space-between',
+    width: '100%',
+    maxWidth: '1200px',
   },
   list: {
     backgroundColor: '#ffffff',
     borderRadius: '8px',
     padding: '10px',
-    minWidth: '300px',
-    maxWidth: '300px',
+    flex: '1',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
     display: 'flex',
     flexDirection: 'column',
@@ -164,8 +197,7 @@ const styles = {
     backgroundColor: '#ffffff',
     borderRadius: '8px',
     padding: '10px',
-    minWidth: '300px',
-    maxWidth: '300px',
+    flex: '1',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
   },
   input: {
