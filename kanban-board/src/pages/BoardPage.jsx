@@ -59,21 +59,37 @@ function BoardPage() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.boardContainer}>
-        <h2 style={styles.title}>项目任务看板</h2>
-
+    <div style={styles.board}>
+      <div style={styles.listsContainer}>
+        <div style={styles.list}>
+          <h3 style={styles.listTitle}>待处理</h3>
+          {tasks.todo.map((task) => (
+            <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
+          ))}
+        </div>
+        <div style={styles.list}>
+          <h3 style={styles.listTitle}>进行中</h3>
+          {tasks.inProgress.map((task) => (
+            <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
+          ))}
+        </div>
+        <div style={styles.list}>
+          <h3 style={styles.listTitle}>已完成</h3>
+          {tasks.done.map((task) => (
+            <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
+          ))}
+        </div>
         <Form form={form} onFinish={addTask} layout="vertical" style={styles.form}>
           <Form.Item name="title" label="任务标题" rules={[{ required: true, message: '请输入任务标题' }]}>
-            <Input placeholder="请输入任务标题" />
+            <Input placeholder="请输入任务标题" style={styles.input} />
           </Form.Item>
 
           <Form.Item name="description" label="任务描述">
-            <TextArea rows={4} placeholder="请输入任务描述" />
+            <TextArea rows={4} placeholder="请输入任务描述" style={styles.input} />
           </Form.Item>
 
           <Form.Item name="status" label="任务状态" rules={[{ required: true, message: '请选择任务状态' }]}>
-            <Select placeholder="请选择任务状态">
+            <Select placeholder="请选择任务状态" style={styles.input}>
               <Option value="todo">待处理</Option>
               <Option value="inProgress">进行中</Option>
               <Option value="done">已完成</Option>
@@ -86,59 +102,54 @@ function BoardPage() {
             </Button>
           </Form.Item>
         </Form>
-
-        <Row gutter={16}>
-          <Col span={8}>
-            <h3>待处理</h3>
-            {tasks.todo.map((task) => (
-              <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
-            ))}
-          </Col>
-          <Col span={8}>
-            <h3>进行中</h3>
-            {tasks.inProgress.map((task) => (
-              <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
-            ))}
-          </Col>
-          <Col span={8}>
-            <h3>已完成</h3>
-            {tasks.done.map((task) => (
-              <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
-            ))}
-          </Col>
-        </Row>
       </div>
     </div>
   );
 }
 
 const styles = {
-  container: {
+  board: {
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     height: '100vh',
     width: '100vw',
-    margin: 0,
-    padding: 0,
+    padding: '20px',
     backgroundColor: '#f0f2f5',
+    overflowX: 'auto',
     boxSizing: 'border-box',
   },
-  boardContainer: {
-    backgroundColor: 'white',
-    padding: '40px',
+  listsContainer: {
+    display: 'flex',
+    gap: '20px',
+  },
+  list: {
+    backgroundColor: '#ffffff',
     borderRadius: '8px',
+    padding: '10px',
+    minWidth: '300px',
+    maxWidth: '300px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-    maxWidth: '900px',
-    width: '100%',
-    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
   },
-  title: {
+  listTitle: {
     textAlign: 'center',
-    marginBottom: '20px',
+    marginBottom: '10px',
+    fontSize: '16px',
+    fontWeight: 'bold',
   },
   form: {
-    marginBottom: '40px',
+    backgroundColor: '#ffffff',
+    borderRadius: '8px',
+    padding: '10px',
+    minWidth: '300px',
+    maxWidth: '300px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+  },
+  input: {
+    width: '100%',
   },
 };
 

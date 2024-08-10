@@ -1,23 +1,29 @@
 import React from 'react';
-import { Card, Button, Select } from 'antd';
-
-const { Option } = Select;
+import { Card } from 'antd';
 
 function TaskCard({ task, onChangeStatus }) {
-  const handleChangeStatus = (value) => {
-    onChangeStatus(task.id, value);
-  };
-
   return (
-    <Card title={task.title} style={{ marginBottom: '10px' }}>
+    <Card
+      style={styles.card}
+      title={task.title}
+      extra={<span style={styles.status}>{task.status}</span>}
+    >
       <p>{task.description}</p>
-      <Select defaultValue={task.status} style={{ width: '100%' }} onChange={handleChangeStatus}>
-        <Option value="todo">待处理</Option>
-        <Option value="inProgress">进行中</Option>
-        <Option value="done">已完成</Option>
-      </Select>
     </Card>
   );
 }
+
+const styles = {
+  card: {
+    marginBottom: '10px',
+    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
+  status: {
+    fontSize: '12px',
+    color: '#999',
+  },
+};
 
 export default TaskCard;
