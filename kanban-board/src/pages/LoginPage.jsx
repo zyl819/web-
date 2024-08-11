@@ -14,8 +14,11 @@ function LoginPage() {
 
   return (
     <div style={styles.container}>
+      <div style={styles.header}>
+        <Title level={2} style={styles.headerTitle}>任务看板</Title>
+      </div>
       <Card style={styles.card}>
-        <Title level={3} style={styles.title}>登录</Title>
+        <Title level={3} style={styles.title}>登录到项目管理系统</Title>
         <Form
           name="login"
           onFinish={onFinish}
@@ -47,12 +50,20 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'column', 
     height: '100vh',
-    backgroundImage: 'linear-gradient(to right, #6a11cb, #2575fc)',
+    backgroundImage: 'linear-gradient(to right, #6a11cb, #2575fc)', 
     margin: 0,  // 移除所有外边距
     padding: 0,  // 移除所有内边距
     boxSizing: 'border-box',
     width: '100vw', // 使容器占满整个视口宽度
+  },
+  header: {
+    marginBottom: '20px', 
+  },
+  headerTitle: {
+    color: '#fff', 
+    textAlign: 'center',
   },
   card: {
     width: '100%', 
@@ -61,6 +72,8 @@ const styles = {
     borderRadius: '10px',
     boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
     textAlign: 'center',
+    background: '#fff', // 确保背景为白色
+    zIndex: 2,  // 确保卡片在背景上层
   },
   title: {
     marginBottom: '20px',
