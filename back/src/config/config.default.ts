@@ -1,9 +1,8 @@
 import { MidwayConfig } from '@midwayjs/core';
 
 export default {
-  // use for cookie sign key, should change to your own and keep security
-  keys: '1723172202904_4811',
+  keys: 'my_key',  // 应用程序的密钥
   koa: {
-    port: 7001,
+    port: 7001,  // Koa 服务器的端口
   },
 } as MidwayConfig;
