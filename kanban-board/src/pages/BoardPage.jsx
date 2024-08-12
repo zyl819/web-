@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Select, DatePicker, Layout, Typography, Upload } from 'antd';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import TaskCard from '../components/TaskCard';
-import { UploadOutlined } from '@ant-design/icons';
-import moment from 'moment';
 
 const { Header, Content } = Layout;
 const { TextArea } = Input;
@@ -10,12 +10,13 @@ const { Option } = Select;
 const { Title } = Typography;
 
 function BoardPage() {
+  const { projectId } = useParams();
   const [tasks, setTasks] = useState({
     todo: [],
     inProgress: [],
     done: [],
   });
-
+  const [fileList, setFileList] = useState([]); // 初始化 fileList
   const [projectName, setProjectName] = useState('');
   const [form] = Form.useForm();
   const username = localStorage.getItem('username');
@@ -23,7 +24,19 @@ function BoardPage() {
   useEffect(() => {
     const fetchedProjectName = "示例项目名称"; // 示例项目名称
     setProjectName(fetchedProjectName);
-  }, []);
+
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get(`/api/projects/${projectId}/tasks`, {
+          params: { username },
+        });
+        setTasks(response.data || { todo: [], inProgress: [], done: [] }); // 确保 tasks 有默认值
+      } catch (error) {
+        console.error('获取任务失败', error);
+      }
+    };
+    fetchTasks();
+  }, [projectId, username]);
 
   const addTask = (values) => {
     const newTask = {
@@ -32,46 +45,52 @@ function BoardPage() {
       description: values.description,
       status: values.status,
       deadline: values.deadline ? values.deadline.format('YYYY-MM-DD') : null,
-      attachments: values.attachments ? values.attachments.fileList.map(file => ({
-        name: file.name,
-        url: URL.createObjectURL(file.originFileObj),
-      })) : [],
+      attachments: fileList,  // 使用 fileList 保存附件
     };
 
-    setTasks((prevTasks) => ({
-      ...prevTasks,
-      [values.status]: [...prevTasks[values.status], newTask],
-    }));
+    setTasks((prevTasks) => {
+      const updatedStatusTasks = prevTasks[values.status] || []; // 确保值是一个数组
+      return {
+        ...prevTasks,
+        [values.status]: [...updatedStatusTasks, newTask],
+      };
+    });
 
+    setFileList([]); // 重置 fileList
     form.resetFields();
   };
 
   const changeTaskStatus = (taskId, newStatus) => {
     let taskToMove;
-
+  
     setTasks((prevTasks) => {
       const updatedTasks = {
-        todo: prevTasks.todo.filter((task) => {
+        todo: prevTasks.todo ? prevTasks.todo.filter((task) => {
           if (task.id === taskId) taskToMove = task;
           return task.id !== taskId;
-        }),
-        inProgress: prevTasks.inProgress.filter((task) => {
+        }) : [],
+        inProgress: prevTasks.inProgress ? prevTasks.inProgress.filter((task) => {
           if (task.id === taskId) taskToMove = task;
           return task.id !== taskId;
-        }),
-        done: prevTasks.done.filter((task) => {
+        }) : [],
+        done: prevTasks.done ? prevTasks.done.filter((task) => {
           if (task.id === taskId) taskToMove = task;
           return task.id !== taskId;
-        }),
+        }) : [],
       };
-
+  
       if (taskToMove) {
         taskToMove.status = newStatus;
         updatedTasks[newStatus] = [...updatedTasks[newStatus], taskToMove];
       }
-
+  
       return updatedTasks;
     });
+  };
+  
+
+  const handleUploadChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
   };
 
   return (
@@ -86,19 +105,19 @@ function BoardPage() {
         <div style={styles.listsContainer}>
           <div style={styles.list}>
             <h3 style={styles.listTitle}>待处理</h3>
-            {tasks.todo.map((task) => (
+            {tasks.todo?.map((task) => (
               <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
             ))}
           </div>
           <div style={styles.list}>
             <h3 style={styles.listTitle}>进行中</h3>
-            {tasks.inProgress.map((task) => (
+            {tasks.inProgress?.map((task) => (
               <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
             ))}
           </div>
           <div style={styles.list}>
             <h3 style={styles.listTitle}>已完成</h3>
-            {tasks.done.map((task) => (
+            {tasks.done?.map((task) => (
               <TaskCard key={task.id} task={task} onChangeStatus={changeTaskStatus} />
             ))}
           </div>
@@ -107,8 +126,8 @@ function BoardPage() {
               <Input placeholder="请输入任务标题" style={styles.input} />
             </Form.Item>
 
-            <Form.Item name="description" label="任务描述">
-              <TextArea rows={4} placeholder="请输入任务描述" style={styles.input} />
+            <Form.Item name="description" label="任务评论">
+              <TextArea rows={4} placeholder="请输入任务评论" style={styles.input} />
             </Form.Item>
 
             <Form.Item name="status" label="任务状态" rules={[{ required: true, message: '请选择任务状态' }]}>
@@ -123,12 +142,12 @@ function BoardPage() {
               <DatePicker placeholder="请选择截止日期" style={styles.input} />
             </Form.Item>
 
-            <Form.Item name="attachments" label="上传附件">
+            <Form.Item name="attachments" label="附件">
               <Upload
-                listType="picture"
-                beforeUpload={() => false} // 阻止自动上传，手动控制上传
+                fileList={fileList}
+                onChange={handleUploadChange}
               >
-                <Button icon={<UploadOutlined />}>选择文件</Button>
+                <Button>上传文件</Button>
               </Upload>
             </Form.Item>
 
@@ -144,12 +163,13 @@ function BoardPage() {
   );
 }
 
+
 const styles = {
   layout: {
     minHeight: '100vh',
     width: '100vw',
     overflowX: 'hidden',
-    backgroundImage: 'linear-gradient(to right, #f5f7fa, #c3cfe2)',
+    backgroundImage: 'linear-gradient(to right, #f5f7fa, #c3cfe2)', // 设置背景颜色
   },
   header: {
     backgroundColor: '#001529',

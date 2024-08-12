@@ -22,29 +22,23 @@ export class ProjectController {
 
   @Post('/projects')
   async createProject(@Body() body: { username: string, name: string }) {
-    console.log('Received request to create project:', body);
     let user = await this.userService.getUser(body.username);
     if (!user) {
-      console.log('User not found, creating new user:', body.username);
       user = await this.userService.createUser(body.username);
     }
-    
-    if (user) {
-      const project = await this.projectService.createProject(body.username, body.name);
-      await this.userService.addProjectToUser(body.username, project);
-      console.log('Project created successfully:', project);
-      return project;
-    }
-    return { message: 'User not found' };
+    const project = await this.projectService.createProject(body.username, body.name);
+    await this.userService.addProjectToUser(body.username, project);
+    return project;
   }
 
   @Post('/projects/:projectId/tasks')
-  async addTask(@Param('projectId') projectId: number, @Body() body: { username: string, title: string, description: string, status: string }) {
+  async addTask(@Param('projectId') projectId: number, @Body() body: { username: string, title: string, description: string, status: string, attachments: any[] }) {
     const task = {
       id: Date.now(),
       title: body.title,
       description: body.description,
       status: body.status,
+      attachments: body.attachments,
     };
     await this.projectService.addTaskToProject(body.username, projectId, task);
     return task;
