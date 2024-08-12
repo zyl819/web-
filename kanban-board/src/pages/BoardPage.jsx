@@ -22,43 +22,59 @@ function BoardPage() {
   const username = localStorage.getItem('username');
 
   useEffect(() => {
-    const fetchedProjectName = "示例项目名称"; // 示例项目名称
-    setProjectName(fetchedProjectName);
-
     const fetchTasks = async () => {
-      try {
-        const response = await axios.get(`/api/projects/${projectId}/tasks`, {
-          params: { username },
-        });
-        setTasks(response.data || { todo: [], inProgress: [], done: [] }); // 确保 tasks 有默认值
-      } catch (error) {
-        console.error('获取任务失败', error);
-      }
+        try {
+            console.log(`Fetching tasks for project ID: ${projectId}, username: ${username}`); // 调试信息
+            const response = await axios.get(`/api/projects/${projectId}/tasks`, {
+                params: { username },
+            });
+            console.log('Tasks fetched from server:', response.data); // 打印从服务器获取的数据
+            setTasks(response.data || { todo: [], inProgress: [], done: [] });
+        } catch (error) {
+            console.error('Failed to fetch tasks:', error); // 打印错误信息
+        }
     };
     fetchTasks();
-  }, [projectId, username]);
+}, [projectId, username]);
 
-  const addTask = (values) => {
-    const newTask = {
+
+const addTask = async (values) => {
+  const newTask = {
       id: Date.now(),
       title: values.title,
       description: values.description,
       status: values.status,
       deadline: values.deadline ? values.deadline.format('YYYY-MM-DD') : null,
-      attachments: fileList,  // 使用 fileList 保存附件
-    };
-
-    setTasks((prevTasks) => {
-      const updatedStatusTasks = prevTasks[values.status] || []; // 确保值是一个数组
-      return {
-        ...prevTasks,
-        [values.status]: [...updatedStatusTasks, newTask],
-      };
-    });
-
-    setFileList([]); // 重置 fileList
-    form.resetFields();
+      attachments: fileList,
   };
+
+  try {
+      console.log('Adding task to server:', newTask); // 调试信息
+      const response = await axios.post(`/api/projects/${projectId}/tasks`, {
+          username: username,
+          ...newTask,
+      });
+
+      if (response.status === 200) {
+          console.log('Task added successfully:', response.data); // 成功信息
+          setTasks((prevTasks) => {
+              const updatedStatusTasks = prevTasks[values.status] || [];
+              return {
+                  ...prevTasks,
+                  [values.status]: [...updatedStatusTasks, newTask],
+              };
+          });
+      } else {
+          console.error('Failed to save task to server'); // 错误信息
+      }
+  } catch (error) {
+      console.error('Error adding task:', error); // 打印错误信息
+  }
+
+  setFileList([]); // 重置 fileList
+  form.resetFields();
+};
+
 
   const changeTaskStatus = (taskId, newStatus) => {
     let taskToMove;

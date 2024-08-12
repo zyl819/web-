@@ -39,16 +39,19 @@ export class ProjectController {
   }
 
   @Post('/projects/:projectId/tasks')
-  async addTask(@Param('projectId') projectId: number, @Body() body: { username: string, title: string, description: string, status: string }) {
+  async addTask(@Param('projectId') projectId: number, @Body() body: { username: string, title: string, description: string, status: string, deadline: string, attachments: any[] }) {
     const task = {
-      id: Date.now(),
-      title: body.title,
-      description: body.description,
-      status: body.status,
+        id: Date.now(),
+        title: body.title,
+        description: body.description,
+        status: body.status,
+        deadline: body.deadline,
+        attachments: body.attachments,
     };
+
     await this.projectService.addTaskToProject(body.username, projectId, task);
     return task;
-  }
+}
 
   @Get('/projects/:projectId/tasks')
   async getTasks(@Param('projectId') projectId: number, @Body('username') username: string) {
