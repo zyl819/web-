@@ -14,14 +14,12 @@ export class ProjectService {
     this.loadProjectsFromFile();
   }
 
-  // 确保目录存在，如果不存在则创建
   private ensureDirectoryExistence(dirPath: string) {
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
   }
 
-  // 从文件中加载项目数据
   private loadProjectsFromFile() {
     if (fs.existsSync(this.dataFilePath)) {
       const data = fs.readFileSync(this.dataFilePath, 'utf-8');
@@ -31,9 +29,10 @@ export class ProjectService {
     }
   }
 
-  // 保存项目数据到文件
   private saveProjectsToFile() {
+    console.log('Saving projects to file...');
     fs.writeFileSync(this.dataFilePath, JSON.stringify(Array.from(this.projects.entries()), null, 2));
+    console.log('Projects saved successfully.');
   }
 
   async createProject(username: string, name: string) {
