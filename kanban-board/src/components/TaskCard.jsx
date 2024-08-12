@@ -25,9 +25,26 @@ function TaskCard({ task, onChangeStatus }) {
       style={{ ...styles.card, ...getCardStyle() }}  // 动态应用样式
     >
       <p>{task.description}</p>
+
+      {task.attachments && task.attachments.length > 0 && (
+        <div style={styles.attachmentsContainer}>
+          <strong>附件:</strong>
+          <ul style={styles.attachmentList}>
+            {task.attachments.map((attachment, index) => (
+              <li key={index}>
+                <a href={attachment.url} download={attachment.name}>
+                  {attachment.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <Select
         value={task.status}
         onChange={(value) => onChangeStatus(task.id, value)}
+        style={styles.select}
       >
         <Option value="todo">待处理</Option>
         <Option value="inProgress">进行中</Option>
@@ -42,6 +59,17 @@ const styles = {
     border: '2px solid',
     borderRadius: '8px',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    marginBottom: '16px',
+  },
+  attachmentsContainer: {
+    marginTop: '12px',
+  },
+  attachmentList: {
+    paddingLeft: '16px',
+  },
+  select: {
+    marginTop: '12px',
+    width: '100%',
   },
 };
 

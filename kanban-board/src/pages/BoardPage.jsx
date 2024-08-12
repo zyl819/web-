@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, DatePicker, Layout, Typography } from 'antd';
+import { Form, Input, Button, Select, DatePicker, Layout, Typography, Upload } from 'antd';
 import TaskCard from '../components/TaskCard';
+import { UploadOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 const { Header, Content } = Layout;
@@ -31,6 +32,10 @@ function BoardPage() {
       description: values.description,
       status: values.status,
       deadline: values.deadline ? values.deadline.format('YYYY-MM-DD') : null,
+      attachments: values.attachments ? values.attachments.fileList.map(file => ({
+        name: file.name,
+        url: URL.createObjectURL(file.originFileObj),
+      })) : [],
     };
 
     setTasks((prevTasks) => ({
@@ -118,6 +123,15 @@ function BoardPage() {
               <DatePicker placeholder="请选择截止日期" style={styles.input} />
             </Form.Item>
 
+            <Form.Item name="attachments" label="上传附件">
+              <Upload
+                listType="picture"
+                beforeUpload={() => false} // 阻止自动上传，手动控制上传
+              >
+                <Button icon={<UploadOutlined />}>选择文件</Button>
+              </Upload>
+            </Form.Item>
+
             <Form.Item>
               <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
                 添加任务
@@ -135,7 +149,7 @@ const styles = {
     minHeight: '100vh',
     width: '100vw',
     overflowX: 'hidden',
-    backgroundImage: 'linear-gradient(to right, #f5f7fa, #c3cfe2)', // 设置背景颜色
+    backgroundImage: 'linear-gradient(to right, #f5f7fa, #c3cfe2)',
   },
   header: {
     backgroundColor: '#001529',

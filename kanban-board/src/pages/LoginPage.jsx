@@ -9,7 +9,7 @@ function LoginPage() {
 
   const onFinish = (values) => {
     localStorage.setItem('username', values.username);
-    navigate('/projects');
+    navigate('/projects');  // 修改为导航到项目页面
   };
 
   return (
@@ -53,10 +53,10 @@ const styles = {
     flexDirection: 'column', 
     height: '100vh',
     backgroundImage: 'linear-gradient(to right, #6a11cb, #2575fc)', 
-    margin: 0,  // 移除所有外边距
-    padding: 0,  // 移除所有内边距
+    margin: 0, 
+    padding: 0, 
     boxSizing: 'border-box',
-    width: '100vw', // 使容器占满整个视口宽度
+    width: '100vw', 
   },
   header: {
     marginBottom: '20px', 
@@ -72,8 +72,8 @@ const styles = {
     borderRadius: '10px',
     boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
     textAlign: 'center',
-    background: '#fff', // 确保背景为白色
-    zIndex: 2,  // 确保卡片在背景上层
+    background: '#fff', 
+    zIndex: 2, 
   },
   title: {
     marginBottom: '20px',
