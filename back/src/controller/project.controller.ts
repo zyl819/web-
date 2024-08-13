@@ -51,12 +51,29 @@ export class ProjectController {
 
     await this.projectService.addTaskToProject(body.username, projectId, task);
     return task;
+  }
+
+  @Get('/projects/:projectId/tasks')
+  async getTasks(@Param('projectId') projectId: number, @Query('username') username: string) {
+    return this.projectService.getProjectTasks(username, projectId);
+  }
+
+  @Post('/projects/:projectId/tasks/update')
+async updateTaskStatus(
+  @Param('projectId') projectId: number,
+  @Body() body: { taskId: number, newStatus: string, username: string }
+) {
+  try {
+    const { taskId, newStatus, username } = body;
+    console.log(`Attempting to update task ${taskId} in project ${projectId} for user ${username}`);
+    const task = await this.projectService.updateTaskStatus(username, projectId, taskId, newStatus);
+    console.log(`Task ${taskId} updated successfully`);
+    return task;
+  } catch (error) {
+    console.error('Error updating task status:', error.message);
+    throw new Error('Failed to update task status');
+  }
 }
 
-@Get('/projects/:projectId/tasks')
-async getTasks(@Param('projectId') projectId: number, @Query('username') username: string) {
-  console.log(`Fetching tasks for project ${projectId} for user ${username}`);
-  return this.projectService.getProjectTasks(username, projectId);
-}
 
 }

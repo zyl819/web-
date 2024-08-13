@@ -47,6 +47,7 @@ export class ProjectService {
             tasks: [],
         };
         this.projects.set(`${username}-${project.id}`, project);
+        console.log('Saving project with ID:', project.id);
         this.saveProjectsToFile();
         console.log(`Project created for user ${username}:`, project); // 项目创建信息
         return project;
@@ -83,4 +84,40 @@ export class ProjectService {
         console.log(`Tasks for project ${projectId}:`, tasks); // 打印项目任务
         return tasks;
     }
+
+    async updateTaskStatus(username: string, projectId: number, taskId: number, newStatus: string) {
+        console.log(`Attempting to update task ${taskId} in project ${projectId} for user ${username}`);
+      
+        const project = this.projects.get(`${username}-${projectId}`);
+      
+        if (!project) {
+          console.error(`Project with ID ${projectId} not found for user ${username}`);
+          throw new Error('Project not found');
+        }
+      
+        console.log(`Project found:`, project);
+      
+        const task = project.tasks.find((task: any) => task.id === taskId);
+      
+        if (!task) {
+          console.error(`Task with ID ${taskId} not found in project ${projectId}`);
+          throw new Error('Task not found');
+        }
+      
+        console.log(`Task found:`, task);
+      
+        task.status = newStatus;
+      
+        // 保存项目状态
+        this.saveProjectsToFile();
+      
+        console.log(`Task status updated successfully to ${newStatus}`);
+      
+        return task;
+      }
+      
+      
+    
+      
+      
 }

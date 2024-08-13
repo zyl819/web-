@@ -101,33 +101,45 @@ const addTask = async (values) => {
 };
 
 
-  const changeTaskStatus = (taskId, newStatus) => {
-    let taskToMove;
-  
-    setTasks((prevTasks) => {
-      const updatedTasks = {
-        todo: prevTasks.todo ? prevTasks.todo.filter((task) => {
-          if (task.id === taskId) taskToMove = task;
-          return task.id !== taskId;
-        }) : [],
-        inProgress: prevTasks.inProgress ? prevTasks.inProgress.filter((task) => {
-          if (task.id === taskId) taskToMove = task;
-          return task.id !== taskId;
-        }) : [],
-        done: prevTasks.done ? prevTasks.done.filter((task) => {
-          if (task.id === taskId) taskToMove = task;
-          return task.id !== taskId;
-        }) : [],
-      };
-  
-      if (taskToMove) {
-        taskToMove.status = newStatus;
-        updatedTasks[newStatus] = [...updatedTasks[newStatus], taskToMove];
-      }
-  
-      return updatedTasks;
+const changeTaskStatus = async (taskId, newStatus) => {
+  let taskToMove;
+
+  setTasks((prevTasks) => {
+    const updatedTasks = {
+      todo: prevTasks.todo ? prevTasks.todo.filter((task) => {
+        if (task.id === taskId) taskToMove = task;
+        return task.id !== taskId;
+      }) : [],
+      inProgress: prevTasks.inProgress ? prevTasks.inProgress.filter((task) => {
+        if (task.id === taskId) taskToMove = task;
+        return task.id !== taskId;
+      }) : [],
+      done: prevTasks.done ? prevTasks.done.filter((task) => {
+        if (task.id === taskId) taskToMove = task;
+        return task.id !== taskId;
+      }) : [],
+    };
+
+    if (taskToMove) {
+      taskToMove.status = newStatus;
+      updatedTasks[newStatus] = [...updatedTasks[newStatus], taskToMove];
+    }
+
+    return updatedTasks;
+  });
+
+  // 将任务状态更改保存到后端
+  try {
+    await axios.post(`/api/projects/${projectId}/tasks/update`, {
+      taskId,
+      newStatus,
+      username: localStorage.getItem('username'),
     });
-  };
+  } catch (error) {
+    console.error('更新任务状态失败', error);
+  }
+};
+
   
 
   const handleUploadChange = ({ fileList: newFileList }) => {
