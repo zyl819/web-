@@ -12,18 +12,21 @@ function ProjectPage() {
   const navigate = useNavigate();
   const username = localStorage.getItem('username');
 
+  // 加载项目列表
   useEffect(() => {
-    async function fetchProjects() {
+    const fetchProjects = async () => {
       try {
         const response = await axios.get(`/api/projects/${username}`);
-        setProjects(response.data);
+        console.log('Fetched projects:', response.data);  // 调试信息
+        setProjects(response.data || []);  // 确保数据存在，并设置为项目列表
       } catch (error) {
         console.error('获取项目失败', error);
       }
-    }
-    fetchProjects();
-  }, [username]);
+    };
 
+    fetchProjects();  // 页面加载时获取项目列表
+  }, [username]);
+  // 添加新项目
   const addProject = async (values) => {
     try {
       const response = await axios.post('/api/projects', {
@@ -31,16 +34,18 @@ function ProjectPage() {
         name: values.name,
       });
       if (response.data && response.data.name) {
+        console.log("Project created:", response.data); // 调试信息
         setProjects([...projects, response.data]);
         form.resetFields();
       } else {
-        console.error('Failed to create project:', response.data);
+        console.error('创建项目失败:', response.data);
       }
     } catch (error) {
       console.error('创建项目失败', error);
     }
   };
 
+  // 选择项目
   const selectProject = (projectId) => {
     navigate(`/projects/${projectId}/tasks`);
   };
@@ -97,7 +102,7 @@ const styles = {
   layout: {
     minHeight: '100vh',
     width: '100vw',
-    backgroundImage: 'linear-gradient(to right, #f5f7fa, #c3cfe2)', // 添加背景颜色
+    backgroundImage: 'linear-gradient(to right, #f5f7fa, #c3cfe2)', 
   },
   header: {
     backgroundColor: '#001529',
