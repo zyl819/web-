@@ -1,4 +1,4 @@
-name: Node.js CI
+name: CI Pipeline
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  frontend-build:
     runs-on: ubuntu-latest
 
     strategy:
@@ -15,36 +15,52 @@ jobs:
         node-version: [20.x]
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    # Debugging: List files in the default working directory
-    - name: List files in default directory
-      run: ls -la
-
-    # Debugging: Print the current working directory
-    - name: Print current directory
-      run: pwd
+    - name: Install frontend dependencies
+      run: npm ci
       working-directory: ./kanban-board
 
-    # Debugging: List files in kanban-board directory
-    - name: List files in kanban-board directory
-      run: ls -la
+    - name: Build frontend
+      run: npm run build --if-present
       working-directory: ./kanban-board
 
-    # Install dependencies in the kanban-board directory
-    - run: npm ci
+    - name: Run frontend tests
+      run: npm test
       working-directory: ./kanban-board
 
-    # Build the project (if applicable)
-    - run: npm run build --if-present
-      working-directory: ./kanban-board
+  backend-build:
+    runs-on: ubuntu-latest
 
-    # Run tests
-    - run: npm test
-      working-directory: ./kanban-board
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install backend dependencies
+      run: npm ci
+      working-directory: ./back  # 假设你的后端代码在 back 目录
+
+    - name: Build backend
+      run: npm run build --if-present
+      working-directory: ./back  # 如果你有构建命令
+
+    - name: Run backend tests
+      run: npm test
+      working-directory: ./back
