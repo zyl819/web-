@@ -23,19 +23,44 @@ function BoardPage() {
 
   useEffect(() => {
     const fetchTasks = async () => {
-        try {
-            console.log(`Fetching tasks for project ID: ${projectId}, username: ${username}`); // 调试信息
-            const response = await axios.get(`/api/projects/${projectId}/tasks`, {
-                params: { username },
-            });
-            console.log('Tasks fetched from server:', response.data); // 打印从服务器获取的数据
-            setTasks(response.data || { todo: [], inProgress: [], done: [] });
-        } catch (error) {
-            console.error('Failed to fetch tasks:', error); // 打印错误信息
-        }
+      try {
+        const response = await axios.get(`/api/projects/${projectId}/tasks`, {
+          params: { username },
+        });
+        const fetchedTasks = response.data;
+  
+        // 创建空的分类
+        const categorizedTasks = {
+          todo: [],
+          inProgress: [],
+          done: [],
+        };
+  
+        // 按状态分类任务
+        fetchedTasks.forEach(task => {
+          if (task.status === 'todo') {
+            categorizedTasks.todo.push(task);
+          } else if (task.status === 'inProgress') {
+            categorizedTasks.inProgress.push(task);
+          } else if (task.status === 'done') {
+            categorizedTasks.done.push(task);
+          }
+        });
+  
+        // 更新状态
+        setTasks(categorizedTasks);
+  
+        console.log("Fetched tasks:", fetchedTasks);
+        console.log("Current tasks state:", categorizedTasks);
+      } catch (error) {
+        console.error('获取任务失败', error);
+      }
     };
+  
     fetchTasks();
-}, [projectId, username]);
+  }, [projectId, username]);
+  
+  
 
 
 const addTask = async (values) => {

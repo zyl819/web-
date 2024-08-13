@@ -1,4 +1,4 @@
-import { Provide, Post, Body, Param, Inject, Controller, Get } from '@midwayjs/decorator';
+import { Provide, Post, Body, Param, Inject, Controller, Get, Query } from '@midwayjs/decorator';
 import { ProjectService } from '../service/project.service';
 import { UserService } from '../service/user.service';
 
@@ -53,8 +53,10 @@ export class ProjectController {
     return task;
 }
 
-  @Get('/projects/:projectId/tasks')
-  async getTasks(@Param('projectId') projectId: number, @Body('username') username: string) {
-    return this.projectService.getProjectTasks(username, projectId);
-  }
+@Get('/projects/:projectId/tasks')
+async getTasks(@Param('projectId') projectId: number, @Query('username') username: string) {
+  console.log(`Fetching tasks for project ${projectId} for user ${username}`);
+  return this.projectService.getProjectTasks(username, projectId);
+}
+
 }

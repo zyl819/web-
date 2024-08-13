@@ -4,6 +4,7 @@ import { Card, Select } from 'antd';
 const { Option } = Select;
 
 function TaskCard({ task, onChangeStatus }) {
+  console.log("TaskCard received task:", task);  // 查看传入的task内容
   // 根据任务状态设置卡片的背景颜色
   const getCardStyle = () => {
     switch (task.status) {

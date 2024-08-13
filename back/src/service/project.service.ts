@@ -20,24 +20,25 @@ export class ProjectService {
         }
     }
 
-    private loadProjectsFromFile() {
-        console.log('Loading projects from file:', this.dataFilePath); // 调试信息
-        if (fs.existsSync(this.dataFilePath)) {
-            const data = fs.readFileSync(this.dataFilePath, 'utf-8');
-            this.projects = new Map(JSON.parse(data));
-            console.log('Projects loaded successfully:', this.projects); // 打印加载的项目数据
-        } else {
-            this.projects = new Map<string, any>();
-            console.log('No existing projects found, initializing new Map.'); // 初始化信息
-        }
-    }
-
     private saveProjectsToFile() {
-        console.log('Saving projects to file...'); // 调试信息
+        console.log('Saving projects to file...');
         fs.writeFileSync(this.dataFilePath, JSON.stringify(Array.from(this.projects.entries()), null, 2));
-        console.log('Projects saved successfully.'); // 保存成功信息
-    }
-
+        console.log('Projects saved successfully to', this.dataFilePath);
+      }
+      
+    
+      private loadProjectsFromFile() {
+        if (fs.existsSync(this.dataFilePath)) {
+          const data = fs.readFileSync(this.dataFilePath, 'utf-8');
+          this.projects = new Map(JSON.parse(data));
+          console.log('Projects loaded successfully from', this.dataFilePath);
+        } else {
+          this.projects = new Map<string, any>();
+          console.log('No existing projects file found, starting with an empty project list.');
+        }
+      }
+      
+    
     async createProject(username: string, name: string) {
         const project = {
             id: Date.now(),
